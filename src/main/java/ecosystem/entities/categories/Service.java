@@ -2,5 +2,5 @@ package ecosystem.entities.categories;
 
 
 
-abstract public class Service extends ValuableEntity{
+abstract public class Service extends Valuable {
 }

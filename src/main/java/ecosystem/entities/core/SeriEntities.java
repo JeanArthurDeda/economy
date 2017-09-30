@@ -2,15 +2,13 @@ package ecosystem.entities.core;
 
 import core.SeriList;
 import core.Entity;
-
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
 
 public class SeriEntities extends SeriList<Entity> {
-    protected HashMap<Class<?>, List<Entity>> mClassEntities = new HashMap<>();
+    protected HashMap<Class<?>, SeriList<Entity>> mClassEntities = new HashMap<>();
 
     @Override
     public boolean add(Entity entity) {
@@ -34,11 +32,11 @@ public class SeriEntities extends SeriList<Entity> {
 
     protected void add2ClassList(Entity entity) {
         // class partition
-        List<Entity> classList = mClassEntities.get(entity.getClass());
+        SeriList<Entity> classList = mClassEntities.get(entity.getClass());
         if (classList != null)
             classList.add(entity);
         else{
-            classList = new ArrayList<>();
+            classList = new SeriList<>();
             classList.add(entity);
             mClassEntities.put(entity.getClass(), classList);
         }
@@ -59,7 +57,7 @@ public class SeriEntities extends SeriList<Entity> {
         super.clear();
     }
 
-    public List<Entity> get (Class<?> entityClass){
+    public SeriList<Entity> get (Class<?> entityClass){
         return mClassEntities.get(entityClass);
     }
 }

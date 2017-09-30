@@ -10,7 +10,7 @@ import java.util.List;
 // ===================================================================================
 // Polymorphic, Bi-directional Entity graph, text serialized, with a pool for entities
 // ===================================================================================
-// Supports Integer, Long, Double, Float, String, Class
+// Supports Boolean, Integer, Long, Double, Float, String, Class
 // and others Seri's
 // Only entities supports bi-directional graph references and they are referenced from a pool
 
@@ -44,7 +44,8 @@ public interface Seri {
 
     default void serialize(Object object, String prefix, List<Entity> entitiesPool, StringBuilder stream) throws IllegalAccessException {
         Class<?> clasa = object.getClass();
-        if (clasa == Integer.class ||
+        if (clasa == Boolean.class ||
+            clasa == Integer.class ||
             clasa == Long.class ||
             clasa == Float.class ||
             clasa == Double.class ||
@@ -56,6 +57,8 @@ public interface Seri {
             stream.append(entitiesPool.indexOf(object));
         } else if (Seri.class.isAssignableFrom(clasa)){
             ((Seri)object).serialize(prefix, entitiesPool, stream);
+        } else if (clasa.isEnum()){
+            stream.append(object.toString());
         }
     }
 
@@ -94,6 +97,8 @@ public interface Seri {
             object = Float.parseFloat(stream.get());
         } else if (clasa == Double.class){
             object = Double.parseDouble(stream.get());
+        } else if (clasa == Boolean.class){
+            object = Boolean.parseBoolean(stream.get());
         } else if (clasa == String.class){
             object = stream.get();
         } else if (Class.class == clasa) {
@@ -104,6 +109,15 @@ public interface Seri {
         } else if (Seri.class.isAssignableFrom(clasa)){
             object = create(clasa);
             ((Seri)object).deserialize(stream, entitiesPool);
+        } else if (clasa.isEnum()) {
+            Object[] enumValues = clasa.getEnumConstants();
+            String value = stream.get();
+            for (Object enumValue : enumValues) {
+                if (value.equals(enumValue.toString())){
+                    object = enumValue;
+                    break;
+                }
+            }
         }
         return object;
     }

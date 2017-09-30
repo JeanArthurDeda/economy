@@ -1,6 +1,9 @@
-package ecosystem.entities.ecosystem;
+package ecosystem;
 
-import core.*;
+import core.Entity;
+import core.SeriMap;
+import core.SeriList;
+import core.Location;
 import core.seri.Seri;
 
 import ecosystem.entities.core.SeriEntities;
@@ -27,13 +30,12 @@ import ecosystem.entities.valuable.sourced.Gas;
 import ecosystem.entities.valuable.sourced.Immobile;
 import ecosystem.entities.valuable.sourced.Land;
 import ecosystem.entities.valuable.sourced.NaturalResource;
-import ecosystem.entities.valuable.sourced.Vechicle;
+import ecosystem.entities.valuable.sourced.EVechicle;
 
-import java.util.*;
 
 
 public class Ecosystem implements Seri {
-    public SeriEntitiesPool mEntitiesPool = new SeriEntitiesPool();
+    public SeriEntitiesPool mEntities = new SeriEntitiesPool();
     public SeriMap<Class<? extends Entity>, Integer> mEntitiesClassCount = new SeriMap<>();
 
     public Ecosystem() {
@@ -41,27 +43,23 @@ public class Ecosystem implements Seri {
         genEntitiesClassCount();
     }
 
-    public SeriEntities getEntitiesPool() {
-        return mEntitiesPool;
+    public SeriEntities getEntities() {
+        return mEntities;
     }
 
-    public List<Entity> getEntitiesPool(Class<?> entityClass) {
-        return mEntitiesPool.get(entityClass);
+    public SeriList<Entity> getEntities(Class<?> entityClass) {
+        return mEntities.get(entityClass);
     }
 
     // ===============
     // Entity spawning
     // ===============
-    public long getNewEntityId (){
-        return mEntitiesPool.size();
-    }
-
     public void linkEntity (Entity entity){
-        mEntitiesPool.add(entity);
+        mEntities.add(entity);
 
         // land link
         if (entity.getClass() != Land.class){
-            List<Entity> lands = getEntitiesPool(Land.class);
+            SeriList<Entity> lands = getEntities(Land.class);
             double minDist = Location.WORLD_EDGE_SIZE * Location.WORLD_EDGE_SIZE * 4.0;
             for (Entity landEntity : lands){
                 Land land = (Land)landEntity;
@@ -84,7 +82,7 @@ public class Ecosystem implements Seri {
     }
 
     public void unlinkEntity (Entity entity){
-        mEntitiesPool.remove(entity);
+        mEntities.remove(entity);
 
         // land unlink
         if (entity.getClass() != Land.class) {
@@ -119,7 +117,7 @@ public class Ecosystem implements Seri {
         mEntitiesClassCount.put(Immobile.class, 0);
         mEntitiesClassCount.put(Land.class, 0);
         mEntitiesClassCount.put(NaturalResource.class, 0);
-        mEntitiesClassCount.put(Vechicle.class, 0);
+        mEntitiesClassCount.put(EVechicle.class, 0);
     }
 
     public SeriMap<Class<? extends Entity>, Integer> getEntitiesClassCount() {

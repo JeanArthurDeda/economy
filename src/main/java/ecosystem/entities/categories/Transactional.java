@@ -6,7 +6,7 @@ import ecosystem.entities.core.SeriEntities;
 
 import java.util.HashMap;
 
-abstract public class TransactionalEntity extends Entity {
+abstract public class Transactional extends Entity {
     // Assets
     public double mCapital;
     public SeriEntities mAssets = new SeriEntities();
@@ -15,7 +15,7 @@ abstract public class TransactionalEntity extends Entity {
     // Expenses
     public transient HashMap<Class<Entity>, Double> mExpensesRatios = new HashMap<>();
 
-    public TransactionalEntity(){
+    public Transactional(){
         super();
     }
 

@@ -1,7 +1,7 @@
 package ecosystem.entities.valuable.service;
 
 
-import ecosystem.entities.categories.ValuableEntity;
+import ecosystem.entities.categories.Valuable;
 
-public class Information extends ValuableEntity{
+public class Information extends Valuable {
 }

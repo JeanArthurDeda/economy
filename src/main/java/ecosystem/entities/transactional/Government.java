@@ -1,7 +1,7 @@
 package ecosystem.entities.transactional;
 
 
-import ecosystem.entities.categories.TransactionalEntity;
+import ecosystem.entities.categories.Transactional;
 
-public class Government extends TransactionalEntity{
+public class Government extends Transactional {
 }

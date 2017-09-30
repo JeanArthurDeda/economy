@@ -4,8 +4,6 @@ package core;
 import core.seri.Seri;
 import ecosystem.entities.valuable.sourced.Land;
 
-import java.lang.reflect.Field;
-
 
 abstract public class Entity implements Seri {
     public Location mLocation;

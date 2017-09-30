@@ -2,15 +2,15 @@ package ecosystem.entities.transactional;
 
 
 import ecosystem.entities.categories.Service;
-import ecosystem.entities.categories.TransactionalEntity;
-import ecosystem.entities.categories.ValuableEntity;
+import ecosystem.entities.categories.Transactional;
+import ecosystem.entities.categories.Valuable;
 
 import java.util.HashMap;
 
-public class Company extends TransactionalEntity{
+public class Company extends Transactional {
     HashMap<Cell, Double> mEmployees = new HashMap<>();
 
     // offers
-    HashMap<Class<ValuableEntity>, Double> mValuables = new HashMap<>();
+    HashMap<Class<Valuable>, Double> mValuables = new HashMap<>();
     HashMap<Class<Service>, Double> mServices = new HashMap<>();
 }

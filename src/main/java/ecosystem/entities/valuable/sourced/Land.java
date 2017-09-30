@@ -2,12 +2,10 @@ package ecosystem.entities.valuable.sourced;
 
 
 import core.Entity;
-import ecosystem.entities.categories.ValuableEntity;
+import ecosystem.entities.categories.Valuable;
 import ecosystem.entities.core.SeriEntities;
 
-import java.util.List;
-
-public class Land extends ValuableEntity{
+public class Land extends Valuable {
     public SeriEntities mEntities = new SeriEntities();
 
     public void addEntity(Entity entity){

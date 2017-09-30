@@ -1,7 +1,7 @@
 package ecosystem.entities.transactional;
 
 
-import ecosystem.entities.categories.TransactionalEntity;
+import ecosystem.entities.categories.Transactional;
 
-public class Cell extends TransactionalEntity{
+public class Cell extends Transactional {
 }

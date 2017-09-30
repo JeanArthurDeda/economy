@@ -1,7 +1,7 @@
 package ecosystem.entities.valuable.sourced;
 
 
-import ecosystem.entities.categories.ValuableEntity;
+import ecosystem.entities.categories.Valuable;
 
-public class Food extends ValuableEntity{
+public class Food extends Valuable {
 }

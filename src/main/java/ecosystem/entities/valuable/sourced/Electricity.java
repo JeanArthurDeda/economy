@@ -1,7 +1,7 @@
 package ecosystem.entities.valuable.sourced;
 
 
-import ecosystem.entities.categories.ValuableEntity;
+import ecosystem.entities.categories.Valuable;
 
-public class Electricity extends ValuableEntity{
+public class Electricity extends Valuable {
 }

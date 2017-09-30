@@ -8,9 +8,24 @@ public class Location implements Seri {
     public double mX;
     public double mY;
 
+    public Location(){
+    }
+
     public Location(double x, double y) {
         mX = x;
         mY = y;
+    }
+
+    public Location setWorldRatio (double xRatio, double yRatio){
+        mX = xRatio * 2.0 - 1.0;
+        mY = yRatio * 2.0 - 1.0;
+        return this;
+    }
+
+    public Location jitter (double sizeX, double sizeY){
+        mX += (Math.random() - 0.5) * sizeX;
+        mY += (Math.random() - 0.5) * sizeY;
+        return this;
     }
 
     public double distTo(Location other){

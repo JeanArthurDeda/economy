@@ -3,7 +3,7 @@ package ecosystem.entities.categories;
 
 import core.Entity;
 
-abstract public class ValuableEntity extends Entity {
+abstract public class Valuable extends Entity {
     public double mNumUnits;
 
     public double getNumUnits (){
