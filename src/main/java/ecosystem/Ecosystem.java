@@ -3,11 +3,12 @@ package ecosystem;
 import core.Entity;
 import core.SeriMap;
 import core.SeriList;
-import core.Location;
+import core.location.Location;
 import core.seri.Seri;
 
 import ecosystem.entities.core.SeriEntities;
 import ecosystem.entities.core.SeriEntitiesPool;
+import ecosystem.entities.core.partition.QuadPartitionedEntities;
 import ecosystem.entities.transactional.Bank;
 import ecosystem.entities.transactional.Banks.NationalBank;
 import ecosystem.entities.transactional.Cell;
@@ -35,8 +36,10 @@ import ecosystem.entities.valuable.sourced.EVechicle;
 
 
 public class Ecosystem implements Seri {
-    public SeriEntitiesPool mEntities = new SeriEntitiesPool();
     public SeriMap<Class<? extends Entity>, Integer> mEntitiesClassCount = new SeriMap<>();
+
+    public SeriEntitiesPool mEntities = new SeriEntitiesPool();
+    public SeriMap<Class<? extends Entity>, QuadPartitionedEntities> mQuadPartitioners = new SeriMap<>();
 
     public Ecosystem() {
         // generate the list of entity extended classes
@@ -47,23 +50,36 @@ public class Ecosystem implements Seri {
         return mEntities;
     }
 
-    public SeriList<Entity> getEntities(Class<?> entityClass) {
+    public SeriList<Entity> getEntities(Class<? extends Entity> entityClass) {
         return mEntities.get(entityClass);
+    }
+
+    public void setPartitioner(Class<? extends Entity> clasa, QuadPartitionedEntities partitioner){
+        mQuadPartitioners.put (clasa, partitioner);
+    }
+
+    public QuadPartitionedEntities getPartitioner (Class<? extends Entity> clasa){
+        return mQuadPartitioners.get(clasa);
     }
 
     // ===============
     // Entity spawning
     // ===============
     public void linkEntity (Entity entity){
+        Class<? extends Entity> clasa = entity.getClass();
+        QuadPartitionedEntities partioner = mQuadPartitioners.get(clasa);
+
+        if (partioner != null)
+            partioner.add(entity);
         mEntities.add(entity);
 
         // land link
-        if (entity.getClass() != Land.class){
+        if (clasa != Land.class){
             SeriList<Entity> lands = getEntities(Land.class);
-            double minDist = Location.WORLD_EDGE_SIZE * Location.WORLD_EDGE_SIZE * 4.0;
+            double minDist = Location.WORLD_DIAGONAL_SIZE;
             for (Entity landEntity : lands){
                 Land land = (Land)landEntity;
-                double dist = entity.getLocation().distTo(land.getLocation());
+                double dist = entity.getLocation().dist(land.getLocation());
                 if (dist < minDist){
                     entity.setLand(land);
                     minDist = dist;
@@ -74,7 +90,6 @@ public class Ecosystem implements Seri {
         }
 
         // generate name
-        Class<? extends Entity> clasa = entity.getClass();
         int count = getEntitiesClassCount().get (clasa);
         String name = clasa.getSimpleName() + "_" + count;
         entity.setName(name);

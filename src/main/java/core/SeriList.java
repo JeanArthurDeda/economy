@@ -9,6 +9,17 @@ import java.util.List;
 // Seri wrapper for list
 
 public class SeriList<T> extends ArrayList<T> implements Seri {
+    public SeriList(){
+        super();
+    }
+
+    public SeriList (T[] objects){
+        super();
+        for (T object : objects) {
+            add (object);
+        }
+    }
+
     @Override
     public boolean isDefault() {
         return size() == 0;

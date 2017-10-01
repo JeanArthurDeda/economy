@@ -1,9 +1,9 @@
 package all_deprecated;
 
 import core.Entity;
-import core.Location;
+import core.location.Location;
 import core.SeriList;
-import ecosystem.builder.buildactions.spawner.postspawnactions.PostSpawnAction;
+import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;

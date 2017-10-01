@@ -2,7 +2,6 @@ package ecosystem.builder.buildactions.spawner;
 
 import core.Entity;
 import core.SeriList;
-import ecosystem.builder.buildactions.spawner.postspawnactions.PostSpawnAction;
 import core.seri.Seri;
 
 public class SpawnParams implements Seri {

@@ -1,8 +1,9 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
-import core.Location;
+import core.location.Location;
 import core.SeriList;
+import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 public class RandomLocationDistribution extends PostSpawnAction {
     @Override

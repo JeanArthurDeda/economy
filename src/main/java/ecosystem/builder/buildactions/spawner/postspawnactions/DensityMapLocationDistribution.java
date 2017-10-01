@@ -1,9 +1,10 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
-import core.Location;
+import core.location.Location;
 import core.SeriList;
 import core.image.IntensityMap;
+import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
@@ -15,7 +16,7 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
     protected transient int mHeight;
     protected transient double mOOWidth;
     protected transient double mOOHeight;
-    protected SeriList<Integer>[] mIndexes = new SeriList[256];
+    protected transient SeriList<Integer>[] mIndexes = new SeriList[256];
 
     public DensityMapLocationDistribution(String url){
         mUrl = url.toLowerCase();
@@ -25,6 +26,8 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
     @Override
     public void cache() throws Exception {
         super.cache();
+
+        System.out.println ("Caching " + mUrl);
 
         IntensityMap map = new IntensityMap();
         if (mUrl.contains("http"))
@@ -50,6 +53,8 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
 
     @Override
     public void execute(SeriList<Entity> entities) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
+        System.out.println ("Executing " + mUrl);
+
         for (Entity entity : entities) {
             Location location = null;
             while (null == location) {

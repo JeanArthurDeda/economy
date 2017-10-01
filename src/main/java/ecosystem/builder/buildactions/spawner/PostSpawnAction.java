@@ -1,4 +1,4 @@
-package ecosystem.builder.buildactions.spawner.postspawnactions;
+package ecosystem.builder.buildactions.spawner;
 
 import core.Entity;
 import core.SeriList;

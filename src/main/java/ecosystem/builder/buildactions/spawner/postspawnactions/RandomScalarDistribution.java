@@ -2,6 +2,7 @@ package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
 import core.SeriList;
+import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;

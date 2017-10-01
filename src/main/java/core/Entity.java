@@ -1,6 +1,7 @@
 package core;
 
 
+import core.location.Location;
 import core.seri.Seri;
 import ecosystem.entities.valuable.sourced.Land;
 
