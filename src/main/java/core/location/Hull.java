@@ -25,7 +25,7 @@ public class Hull implements Seri {
         setFrom(bound);
     }
 
-    public Hull setWorldBound(){
+    public Hull setFromWorldBound(){
         mLocations.clear();
         mLocations.add(new Location(-1.0, -1.0));
         mLocations.add(new Location(1.0, -1.0));

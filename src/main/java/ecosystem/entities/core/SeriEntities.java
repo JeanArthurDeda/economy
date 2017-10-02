@@ -5,6 +5,7 @@ import core.Entity;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 
 public class SeriEntities extends SeriList<Entity> {
@@ -59,5 +60,9 @@ public class SeriEntities extends SeriList<Entity> {
 
     public SeriList<Entity> get (Class<?> entityClass){
         return mClassEntities.get(entityClass);
+    }
+
+    public Set<Class<?>> getClasses (){
+        return mClassEntities.keySet();
     }
 }

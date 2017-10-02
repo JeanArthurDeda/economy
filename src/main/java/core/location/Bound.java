@@ -3,6 +3,9 @@ package core.location;
 import core.MathExt;
 import core.seri.Seri;
 
+import java.awt.*;
+import java.awt.geom.Rectangle2D;
+
 public class Bound implements Seri {
     public Location mMin = new Location(Double.MAX_VALUE, Double.MAX_VALUE);
     public Location mMax = new Location(-Double.MAX_VALUE, -Double.MAX_VALUE);
@@ -48,6 +51,12 @@ public class Bound implements Seri {
         return dist (location.getX(), location.getY());
     }
 
+    public Bound setClosest (Location set, Location reference){
+        set.setX (MathExt.clamp(reference.getX(), mMin.getX(), mMax.getX()));
+        set.setY (MathExt.clamp(reference.getY(), mMin.getY(), mMax.getY()));
+        return this;
+    }
+
     public double distSq (double locationX, double locationY){
         double x = MathExt.clamp(locationX, mMin.getX(), mMax.getX()) - locationX;
         double y = MathExt.clamp(locationY, mMin.getY(), mMax.getY()) - locationY;
@@ -66,6 +75,12 @@ public class Bound implements Seri {
             location.getY() < mMin.getY())
             return false;
         return true;
+    }
+
+    public Bound render (Graphics2D render, int width, int height){
+        render.draw(new Rectangle2D.Double( (mMin.getX() * 0.5 + 0.5) * width, (mMin.getY() * 0.5 + 0.5) * height,
+                                            (mMax.getX() * 0.5 + 0.5) * width, (mMax.getY() * 0.5 + 0.5) * height));
+        return this;
     }
 
 }

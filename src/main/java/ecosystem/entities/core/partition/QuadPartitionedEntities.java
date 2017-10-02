@@ -7,6 +7,8 @@ import core.location.Location;
 import core.seri.Seri;
 import ecosystem.entities.core.SeriEntities;
 
+import java.awt.*;
+
 public class QuadPartitionedEntities implements Seri{
     public SeriList<PartitionQuad> mQuads;
     public double mQuadSize;
@@ -71,5 +73,15 @@ public class QuadPartitionedEntities implements Seri{
 
     public SeriList<PartitionQuad> getQuads () {
         return mQuads;
+    }
+
+    public QuadPartitionedEntities render (Graphics2D render, int width, int height){
+        render.setColor(new Color(192, 192, 192));
+        for (PartitionQuad quad : mQuads) {
+            if (0 == quad.getEntities().getClasses().size())
+                continue;
+            quad.getBound().render(render, width, height);
+        }
+        return this;
     }
 }
