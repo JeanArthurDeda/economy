@@ -7,9 +7,26 @@ public class Bound implements Seri {
     public Location mMin = new Location(Double.MAX_VALUE, Double.MAX_VALUE);
     public Location mMax = new Location(-Double.MAX_VALUE, -Double.MAX_VALUE);
 
+    public Bound (){
+    }
+
     public Bound (Location min, Location max){
         mMax = max;
         mMin = min;
+    }
+
+    public Bound reset (){
+        mMin.set(Double.MAX_VALUE, Double.MAX_VALUE);
+        mMax.set(-Double.MAX_VALUE, -Double.MAX_VALUE);
+        return this;
+    }
+
+    public Location getMin() {
+        return mMin;
+    }
+
+    public Location getMax() {
+        return mMax;
     }
 
     public Bound add (Location location){

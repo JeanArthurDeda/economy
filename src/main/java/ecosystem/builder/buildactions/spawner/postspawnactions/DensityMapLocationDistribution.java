@@ -1,6 +1,7 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
+import core.Rand;
 import core.location.Location;
 import core.SeriList;
 import core.image.IntensityMap;
@@ -27,8 +28,6 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
     public void cache() throws Exception {
         super.cache();
 
-        System.out.println ("Caching " + mUrl);
-
         IntensityMap map = new IntensityMap();
         if (mUrl.contains("http"))
             map.load(new URL(mUrl));
@@ -53,12 +52,10 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
 
     @Override
     public void execute(SeriList<Entity> entities) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        System.out.println ("Executing " + mUrl);
-
         for (Entity entity : entities) {
             Location location = null;
             while (null == location) {
-                int chance = (int) (Math.random() * 254.0) + 1;
+                int chance = (int) (Rand.get() * 254.0) + 1;
                 location = getLocation(chance);
             }
             entity.setLocation(location);
@@ -79,7 +76,7 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
         // ======
         // choose
         // ======
-        int chosen = (int)(Math.random() * (double)count);
+        int chosen = (int)(Rand.get() * (double)count);
         int index = 0;
         count = 0;
         for (int i = chance; i <= 255; ++i)
@@ -101,4 +98,8 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
         return new Location().setWorldRatio(ratioX, ratioY).jitter(mOOWidth, mOOHeight);
     }
 
+    @Override
+    public String toString() {
+        return super.toString() + " " + mUrl;
+    }
 }

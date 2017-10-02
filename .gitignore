@@ -1,0 +1,5 @@
+.gradle
+debugTree
+out
+
+/.idea/workspace.xml

@@ -19,4 +19,9 @@ public abstract class PostSpawnAction implements Seri {
     }
 
     public abstract void execute(SeriList<Entity> entities) throws InvocationTargetException, IllegalAccessException, NoSuchMethodException;
+
+    @Override
+    public String toString() {
+        return getClass().getSimpleName();
+    }
 }

@@ -1,6 +1,7 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
+import core.Rand;
 import core.SeriList;
 import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
@@ -37,7 +38,7 @@ public class RandomScalarDistribution extends PostSpawnAction {
         double[] values = new double[count];
         double total = 0.0;
         for (int i = 0; i < values.length; i++) {
-            total += values[i] = Math.random();
+            total += values[i] = Rand.get();
         }
         double scale = mTotalValue / total;
 

@@ -1,6 +1,7 @@
 package ecosystem.builder.buildactions;
 
 import core.Entity;
+import core.location.Hull;
 import core.location.Location;
 import core.SeriList;
 import core.location.LocationStack;
@@ -10,6 +11,7 @@ import ecosystem.entities.core.SeriEntities;
 import ecosystem.entities.core.partition.PartitionQuad;
 import ecosystem.entities.core.partition.QuadPartitionedEntities;
 import ecosystem.entities.core.partition.SpiralIterator;
+import ecosystem.entities.valuable.sourced.Land;
 
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -21,28 +23,17 @@ import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 public class Dumper extends BuildAction {
-    public enum Type {
-        POINT,
-        VORONOI
-    }
-
     public static class Params implements Seri {
         public Class<? extends Entity> mClasa;
         public int mColor;
-        public Type mType;
 
-        public Params (Class<? extends Entity> clasa, Type type, int color){
+        public Params (Class<? extends Entity> clasa, int color){
             mClasa = clasa;
-            mType = type;
             mColor = color;
         }
 
         public int getColor (){
             return mColor;
-        }
-
-        public Type getType (){
-            return mType;
         }
 
         public Class<? extends Entity> getClasa() {
@@ -68,27 +59,21 @@ public class Dumper extends BuildAction {
 
     @Override
     public void execute(Ecosystem ecosystem) throws InvocationTargetException, NoSuchMethodException, IOException, IllegalAccessException, InstantiationException {
-        System.out.println ("Executing " + mUrl);
         BufferedImage image = new BufferedImage(mWidth, mHeight, BufferedImage.TYPE_INT_RGB);
 
         for (Params params : mParams) {
             Class<? extends Entity> clasa = params.getClasa ();
-            Type type = params.getType();
+            SeriList<Entity> entities = ecosystem.getEntities(clasa);
             int color = params.getColor();
-            switch (type) {
-                case POINT:
-                    drawPoints(image, ecosystem, clasa, color);
-                    break;
-                case VORONOI:
-                    drawVoronoi(image, ecosystem, clasa, color);
-                    break;
-            }
+            if (clasa == Land.class)
+                drawHulls(image, entities, color);
+            else
+                drawPoints(image, entities, color);
         }
         ImageIO.write(image, "jpg", new File (mUrl));
     }
 
     private void drawVoronoi(BufferedImage image, Ecosystem ecosystem, Class<? extends Entity> clasa, int color) {
-        long time = System.currentTimeMillis();
         LocationStack stack = new LocationStack(3);
         double texelSize = 0.5 * Location.WORLD_DIAGONAL_SIZE / Math.sqrt (mWidth * mWidth + mHeight * mHeight);
 
@@ -187,7 +172,7 @@ public class Dumper extends BuildAction {
 
                 // compute the middle point between the voronoi cells
                 stack.reset();
-                Location middle = loc1.add(loc2, stack).mul(0.5);
+                Location middle = loc1.add(loc2, stack).scale(0.5);
 
                 // compute the direction of the voronoi cells
                 Location dir = loc2.sub(loc1, stack).normalize();
@@ -197,18 +182,15 @@ public class Dumper extends BuildAction {
 
                 // compute the point on line
                 double dot = dir.dot(pointOnLine);
-                pointOnLine.set(loc1).add(dir.mul(dot));
+                pointOnLine.set(loc1).add(dir.scale(dot));
 
                 double d = pointOnLine.dist(middle);
                 if (d < texelSize)
                     image.setRGB(x, y, color);
             }
-        time = System.currentTimeMillis() - time;
-        System.out.println(String.format("DrawVoronoi %d", time));
     }
 
-    protected void drawPoints(BufferedImage image, Ecosystem ecosystem, Class<? extends Entity> clasa, int color) {
-        SeriList<Entity> entities = ecosystem.getEntities(clasa);
+    protected void drawPoints(BufferedImage image, SeriList<Entity> entities, int color) {
         Graphics2D render = image.createGraphics();
         render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
         render.setBackground(null);
@@ -218,5 +200,21 @@ public class Dumper extends BuildAction {
             double y = (location.getY() * 0.5 + 0.5) * mHeight;
             render.fill(new Rectangle2D.Double(x - 0.5, y - 0.5, 0.5, 0.5));
         }
+    }
+
+    protected void drawHulls(BufferedImage image, SeriList<Entity> entities, int color) {
+        Graphics2D render = image.createGraphics();
+        render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
+        render.setBackground(null);
+        for (Entity entity : entities) {
+            Land land = (Land)entity;
+            Hull hull = land.getHull();
+            hull.render(render, mWidth, mHeight, 0);
+        }
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " " + mUrl + " " + mWidth + "x" + mHeight;
     }
 }

@@ -1,5 +1,6 @@
 package core.location;
 
+import core.Rand;
 import core.seri.Seri;
 
 public class Location implements Seri {
@@ -103,6 +104,13 @@ public class Location implements Seri {
         return this;
     }
 
+    public Location rotate90() {
+        double t = mX;
+        mX = mY;
+        mY = -t;
+        return this;
+    }
+
     public Location add (double locationX, double locationY){
         mX += locationX;
         mY += locationY;
@@ -129,20 +137,20 @@ public class Location implements Seri {
         return this;
     }
 
-    public Location mul (double value){
+    public Location scale(double value){
         mX *= value;
         mY *= value;
         return this;
     }
 
-    public Location mul (double locationX, double locationY){
+    public Location scale(double locationX, double locationY){
         mX *= locationX;
         mY *= locationY;
         return this;
     }
 
     public Location jitter (double sizeX, double sizeY){
-        return add ((Math.random() - 0.5) * sizeX, (Math.random() - 0.5) * sizeY);
+        return add ((Rand.get() - 0.5) * sizeX, (Rand.get() - 0.5) * sizeY);
     }
 
     public Location clone (LocationStack stack){
@@ -180,14 +188,14 @@ public class Location implements Seri {
         return clone.negate();
     }
 
-    public Location mul (double value, LocationStack stack){
+    public Location scale(double value, LocationStack stack){
         Location clone = clone(stack);
-        return clone.mul(value);
+        return clone.scale(value);
     }
 
-    public Location mul (double locationX, double locationY, LocationStack stack){
+    public Location scale(double locationX, double locationY, LocationStack stack){
         Location clone = clone(stack);
-        return clone.mul(locationX, locationY);
+        return clone.scale(locationX, locationY);
     }
 
 }
