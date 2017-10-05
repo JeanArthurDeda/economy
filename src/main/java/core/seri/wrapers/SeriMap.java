@@ -1,7 +1,9 @@
-package core;
+package core.seri.wrapers;
 
+import core.Entity;
 import core.seri.Seri;
 import core.seri.SeriConf;
+import core.seri.TokenStream;
 
 import java.util.HashMap;
 import java.util.List;

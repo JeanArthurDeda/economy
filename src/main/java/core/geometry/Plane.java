@@ -1,4 +1,4 @@
-package core.location;
+package core.geometry;
 
 import core.seri.Seri;
 

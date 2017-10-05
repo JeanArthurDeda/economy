@@ -1,13 +1,13 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
-import core.Rand;
-import core.location.Location;
-import core.SeriList;
+import core.MathExt;
+import core.geometry.Location;
+import core.seri.wrapers.SeriList;
 import core.image.IntensityMap;
 import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
-import java.io.File;
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 
@@ -21,18 +21,19 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
 
     public DensityMapLocationDistribution(String url){
         mUrl = url.toLowerCase();
-
     }
 
     @Override
     public void cache() throws Exception {
         super.cache();
 
+        boolean isUrl = mUrl.contains("http");
         IntensityMap map = new IntensityMap();
-        if (mUrl.contains("http"))
+        if (isUrl)
             map.load(new URL(mUrl));
         else
-            map.load(new File(mUrl));
+            map.load(new File (mUrl));
+
         mWidth = map.getWidth();
         mHeight = map.getHeight();
         mOOWidth = 1.0 / (double)mWidth;
@@ -55,7 +56,7 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
         for (Entity entity : entities) {
             Location location = null;
             while (null == location) {
-                int chance = (int) (Rand.get() * 254.0) + 1;
+                int chance = (int) (MathExt.random() * 254.0) + 1;
                 location = getLocation(chance);
             }
             entity.setLocation(location);
@@ -76,7 +77,7 @@ public class DensityMapLocationDistribution extends PostSpawnAction {
         // ======
         // choose
         // ======
-        int chosen = (int)(Rand.get() * (double)count);
+        int chosen = (int)(MathExt.random() * (double)count);
         int index = 0;
         count = 0;
         for (int i = chance; i <= 255; ++i)

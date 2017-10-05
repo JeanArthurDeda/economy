@@ -1,6 +1,6 @@
-package core.location;
+package core.geometry;
 
-import core.SeriList;
+import core.seri.wrapers.SeriList;
 import core.seri.Seri;
 
 import java.awt.*;

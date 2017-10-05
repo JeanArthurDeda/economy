@@ -1,7 +1,7 @@
 package ecosystem.entities.core;
 
 import core.Entity;
-import core.TokenStream;
+import core.seri.TokenStream;
 import core.seri.SeriConf;
 
 import java.util.List;

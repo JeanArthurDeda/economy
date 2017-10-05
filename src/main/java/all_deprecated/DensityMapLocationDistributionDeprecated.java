@@ -1,9 +1,9 @@
 package all_deprecated;
 
 import core.Entity;
-import core.Rand;
-import core.location.Location;
-import core.SeriList;
+import core.MathExt;
+import core.geometry.Location;
+import core.seri.wrapers.SeriList;
 import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 import java.io.File;
@@ -51,10 +51,10 @@ public class DensityMapLocationDistributionDeprecated extends PostSpawnAction {
         int leafSize = mIntensityMapTree.getRootSize();
 
         for (Entity entity : entities) {
-            float chance = (float)Rand.get();
+            float chance = (float)MathExt.random();
             mNumRands ++;
             while (chance < root.min || chance > root.max){
-                chance = (float)Rand.get();
+                chance = (float)MathExt.random();
                 mNumRands ++;
             }
 
@@ -66,7 +66,7 @@ public class DensityMapLocationDistributionDeprecated extends PostSpawnAction {
         int numIndexes = mIntensityMapTree.computeLeavesIndexesContaining(leaves, 0.5f, mIndexes);
 
         // decide which path to take
-        int chosen = (int)(Rand.get() * (double)numIndexes);
+        int chosen = (int)(MathExt.random() * (double)numIndexes);
         mNumRands ++;
         IntensityMapTreeDeprecated.Index index = mIndexes[chosen];
         IntensityMapTreeDeprecated.Leaf leaf = leaves[index.index];
@@ -74,7 +74,7 @@ public class DensityMapLocationDistributionDeprecated extends PostSpawnAction {
         // is it a node or a leaf
         if (null == leaf.leaves){
             numIndexes = mIntensityMapTree.computeTexelsIndexesContaining(x + index.x * leafSize, y + index.y * leafSize, chance, mIndexes);
-            chosen = (int)(Rand.get() * (double)numIndexes);
+            chosen = (int)(MathExt.random() * (double)numIndexes);
             mNumRands ++;
             index = mIndexes[chosen];
             double ooW = 1.0 / (double)mIntensityMapTree.getWidth();

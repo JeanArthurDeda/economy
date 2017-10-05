@@ -1,13 +1,12 @@
 package ecosystem.builder;
 
-import core.SeriList;
+import core.seri.wrapers.SeriList;
+import core.performance.TimedTask;
 import core.seri.Seri;
-import core.seri.SeriConf;
 import ecosystem.Ecosystem;
 import ecosystem.builder.buildactions.BuildAction;
-import ecosystem.entities.core.partition.QuadPartitionedEntities;
+import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.valuable.sourced.Land;
-import org.omg.PortableInterceptor.SYSTEM_EXCEPTION;
 
 public class EcosystemBuilder implements Seri {
     public int mNumLandQuads;
@@ -25,17 +24,19 @@ public class EcosystemBuilder implements Seri {
     public Ecosystem build () throws Exception {
         Ecosystem ecosystem = new Ecosystem();
 
-        ecosystem.setPartitioner(Land.class, new QuadPartitionedEntities(mNumLandQuads));
+        ecosystem.setPartitioner(Land.class, new Partitioner(mNumLandQuads));
 
-        long time = System.currentTimeMillis();
+        TimedTask.start(getClass().getSimpleName() + ".build");
+
         for (BuildAction buildAction : mBuildActions) {
-            long localTime = System.currentTimeMillis();
+            TimedTask.start(buildAction.toString());
+
             buildAction.execute(ecosystem);
-            localTime = System.currentTimeMillis() - localTime;
-            System.out.println(String.format("%10d", localTime) + SeriConf.INDENT + buildAction.toString());
+
+            TimedTask.finish();
         }
-        time = System.currentTimeMillis() - time;
-        System.out.println(String.format("%10d", time) + " total of " + getClass().getSimpleName());
+
+        TimedTask.finish();
 
         return ecosystem;
     }

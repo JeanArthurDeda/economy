@@ -1,9 +1,9 @@
 package ecosystem.builder.buildactions.spawner;
 
 import core.Entity;
-import core.SeriList;
-import core.SeriMap;
-import core.seri.SeriConf;
+import core.seri.wrapers.SeriList;
+import core.seri.wrapers.SeriMap;
+import core.performance.TimedTask;
 import ecosystem.Ecosystem;
 import ecosystem.builder.buildactions.BuildAction;
 
@@ -24,23 +24,21 @@ public class SpawnAction extends BuildAction {
             SeriList<Entity> entities = new SeriList<>();
 
             // spawn them
-            long time = System.currentTimeMillis();
             int count = spawnParams.getCount();
+            TimedTask.start("Spawn " + count + " " + key.getSimpleName());
             for (int i = 0; i < count; ++i)
                 entities.add ((Entity)create(key));
-            time = System.currentTimeMillis() - time;
-            System.out.println(String.format("%10d", time) + SeriConf.INDENT + SeriConf.INDENT + "spawning " + entities.size());
+            TimedTask.finish();
 
             // post spawn actions
             spawnParams.executePostSpawn(entities);
 
             // link them
-            time = System.currentTimeMillis();
+            TimedTask.start("Link " + count + " " + key.getSimpleName());
             for (Entity entity : entities) {
                 ecosystem.linkEntity(entity);
             }
-            time = System.currentTimeMillis() - time;
-            System.out.println(String.format("%10d", time) + SeriConf.INDENT + SeriConf.INDENT + "Linking " + entities.size());
+            TimedTask.finish();
         }
     }
 }

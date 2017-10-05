@@ -1,7 +1,7 @@
 package core;
 
 
-import core.location.Location;
+import core.geometry.Location;
 import core.seri.Seri;
 import ecosystem.entities.valuable.sourced.Land;
 
@@ -29,5 +29,9 @@ abstract public class Entity implements Seri {
 
     public void setName (String name){
         mName = name;
+    }
+
+    public String getName() {
+        return mName;
     }
 }

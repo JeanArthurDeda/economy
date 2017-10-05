@@ -1,7 +1,7 @@
 package ecosystem.entities.transactional;
 
 
-import core.SeriList;
+import core.seri.wrapers.SeriList;
 import economic.Account;
 import ecosystem.entities.categories.Transactional;
 

@@ -1,4 +1,4 @@
-package core.location;
+package core.geometry;
 
 import core.MathExt;
 import core.seri.Seri;
@@ -78,8 +78,11 @@ public class Bound implements Seri {
     }
 
     public Bound render (Graphics2D render, int width, int height){
-        render.draw(new Rectangle2D.Double( (mMin.getX() * 0.5 + 0.5) * width, (mMin.getY() * 0.5 + 0.5) * height,
-                                            (mMax.getX() * 0.5 + 0.5) * width, (mMax.getY() * 0.5 + 0.5) * height));
+        double x = (mMin.getX() * 0.5 + 0.5) * width;
+        double y = (mMin.getY() * 0.5 + 0.5) * height;
+        double w = (mMax.getX() - mMin.getX ()) * width * 0.5;
+        double h = (mMax.getY() - mMin.getY ()) * height * 0.5;
+        render.draw(new Rectangle2D.Double( x, y, w, h));
         return this;
     }
 

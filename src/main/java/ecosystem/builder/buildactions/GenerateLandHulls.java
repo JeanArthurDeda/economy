@@ -1,13 +1,14 @@
 package ecosystem.builder.buildactions;
 
 import core.Entity;
-import core.SeriList;
-import core.location.Hull;
-import core.location.Location;
-import core.location.Plane;
+import core.seri.wrapers.SeriList;
+import core.performance.TimedTask;
+import core.geometry.Hull;
+import core.geometry.Location;
+import core.geometry.Plane;
 import ecosystem.Ecosystem;
 import ecosystem.entities.core.partition.PartitionQuad;
-import ecosystem.entities.core.partition.QuadPartitionedEntities;
+import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.core.partition.SpiralIterator;
 import ecosystem.entities.valuable.sourced.Land;
 
@@ -15,7 +16,7 @@ public class GenerateLandHulls extends BuildAction {
 
     @Override
     public void execute(Ecosystem ecosystem) throws Exception {
-        QuadPartitionedEntities partioner = ecosystem.getPartitioner(Land.class);
+        Partitioner partioner = ecosystem.getPartitioner(Land.class);
         SeriList<PartitionQuad> quads = partioner.getQuads();
 
         // ========================
@@ -29,14 +30,10 @@ public class GenerateLandHulls extends BuildAction {
             protected Location mMiddle = new Location();
             protected Location mNor = new Location();
             protected Plane mPlane = new Plane();
-            protected int mLandQuadX;
-            protected int mLandQuadY;
             // finishing
-            protected boolean mSpiralSquareDirty;
+            protected boolean mDirty;
 
-            public void setLand (Land land, int quadX, int quadY){
-                mLandQuadX = quadX;
-                mLandQuadY = quadY;
+            public void setLand (Land land){
                 mLand = land;
             }
 
@@ -48,9 +45,9 @@ public class GenerateLandHulls extends BuildAction {
 
             @Override
             public boolean onStartSquare(int x, int y, int startX, int startY) {
-                if (!mSpiralSquareDirty)
+                if (!mDirty)
                     return false;
-                mSpiralSquareDirty = false;
+                mDirty = false;
                 return true;
             }
 
@@ -61,17 +58,26 @@ public class GenerateLandHulls extends BuildAction {
                 // trivial rejection based on population
                 SeriList<Entity> entities = quad.getEntities().get(Land.class);
                 if (null == entities){
+                    mDirty = true;
                     return true;
                 }
 
-                // trivial rejection based on bound
+                // trivial rejection based on quad
                 Location l1 = mLand.getLocation();
-                if (x != mLandQuadX && y != mLandQuadY) {
-                    quad.getBound().setClosest(mMiddle, l1);
-                    mNor.set(mMiddle).sub(l1).normalize();
-                    mMiddle.add(l1).scale(0.5);
-                    mPlane.set(mMiddle, mNor);
-                    if (Hull.CheckResult.INTERSECT != mHull.checkWithPlane(mPlane)) {
+                if (x != startX || y != startY) {
+                    double extent = 0;
+                    SeriList<Location> locations = mHull.getLocations();
+                    for (Location location : locations) {
+                        extent = Math.max (extent, location.dist(mLand.getLocation()));
+                    }
+                    double distToQuad = quad.getBound().dist(mLand.getLocation());
+
+                    if (distToQuad * 0.5 > extent)
+                        return true;
+                    mDirty = true;
+                } else {
+                    mDirty = true;
+                    if (entities.size() == 1){
                         return true;
                     }
                 }
@@ -88,7 +94,6 @@ public class GenerateLandHulls extends BuildAction {
 
                     if (Hull.CheckResult.INTERSECT == mHull.checkWithPlane(mPlane)){
                         mHull.carve(mPlane);
-                        mSpiralSquareDirty = true;
                     }
                 }
                 return true;
@@ -98,10 +103,14 @@ public class GenerateLandHulls extends BuildAction {
         SpiralIterator spiralIterator = new SpiralIterator();
 
         SeriList<Entity> entities = ecosystem.getEntities(Land.class);
-        for (Entity entity : entities) {
+        int size = entities.size();
+        for (int i = 0; i < size; i++) {
+            double ratio = (double)i / (double)size;
+            TimedTask.update(ratio);
+            Entity entity = entities.get(i);
             int x = partioner.getQuadX(entity.getLocation());
             int y = partioner.getQuadY(entity.getLocation());
-            hullConstructor.setLand((Land)entity, x, y);
+            hullConstructor.setLand((Land)entity);
             spiralIterator.iterate(x, y, partioner.getNumQuads(), partioner.getNumQuads(), hullConstructor);
         }
     }

@@ -1,20 +1,20 @@
 package ecosystem.entities.core.partition;
 
 import core.Entity;
-import core.SeriList;
-import core.location.Bound;
-import core.location.Location;
+import core.seri.wrapers.SeriList;
+import core.geometry.Bound;
+import core.geometry.Location;
 import core.seri.Seri;
 import ecosystem.entities.core.SeriEntities;
 
 import java.awt.*;
 
-public class QuadPartitionedEntities implements Seri{
+public class Partitioner implements Seri{
     public SeriList<PartitionQuad> mQuads;
     public double mQuadSize;
     public int mNumQuads;
 
-    public QuadPartitionedEntities(int numQuads){
+    public Partitioner(int numQuads){
         mNumQuads = numQuads;
         mQuadSize = Location.WORLD_EDGE_SIZE / (double)numQuads;
         mQuads = new SeriList<>();
@@ -75,13 +75,40 @@ public class QuadPartitionedEntities implements Seri{
         return mQuads;
     }
 
-    public QuadPartitionedEntities render (Graphics2D render, int width, int height){
-        render.setColor(new Color(192, 192, 192));
-        for (PartitionQuad quad : mQuads) {
-            if (0 == quad.getEntities().getClasses().size())
-                continue;
-            quad.getBound().render(render, width, height);
+    public Partitioner render (Graphics2D render, int width, int height, Integer quadColor, Integer emptyQuadColor, Integer quadIndexesColor){
+
+        // draw full quads
+        if (quadColor != null || emptyQuadColor != null) {
+            Color quadCol = quadColor != null ? new Color((quadColor >> 16) & 0xff, (quadColor >> 8) & 0xff, quadColor & 0xff) : null;
+            Color emptyQuadCol = emptyQuadColor != null ? new Color((emptyQuadColor >> 16) & 0xff, (emptyQuadColor >> 8) & 0xff, emptyQuadColor & 0xff) : null;
+            for (PartitionQuad quad : mQuads) {
+                Color color = quadCol;
+                if (0 == quad.getEntities().getClasses().size())
+                    color = emptyQuadCol;
+                if (null == color)
+                    continue;
+                render.setColor (color);
+                Bound bound = quad.getBound();
+                bound.render(render, width, height);
+            }
         }
+
+        // draw quad indexes
+        if (quadIndexesColor != null)
+            render.setColor (new Color((quadIndexesColor >> 16) & 0xff, (quadIndexesColor >> 8) & 0xff, quadIndexesColor & 0xff));
+            for (int i = 0; i < mNumQuads; ++i)
+                for (int j = 0; j < mNumQuads; ++j) {
+                    PartitionQuad quad = mQuads.get(i * mNumQuads + j);
+                    if (0 == quad.getEntities().getClasses().size() && null == emptyQuadColor)
+                        continue;
+                    Bound bound = quad.getBound();
+                    double x = 0.5 * (bound.getMax().getX() + bound.getMin().getX());
+                    double y = 0.5 * (bound.getMax().getY() + bound.getMin().getY());
+                    x = width * (x * 0.5 + 0.5);
+                    y = width * (y * 0.5 + 0.5);
+                    render.drawString(j + "," + i, (float) x, (float) y);
+                }
+
         return this;
     }
 }

@@ -1,25 +1,16 @@
-package core;
+package core.seri.wrapers;
 
+import core.Entity;
 import core.seri.Seri;
 import core.seri.SeriConf;
+import core.seri.TokenStream;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
-// Seri wrapper for list
+// Seri wrapper for set
 
-public class SeriList<T> extends ArrayList<T> implements Seri {
-    public SeriList(){
-        super();
-    }
-
-    public SeriList (T[] objects){
-        super();
-        for (T object : objects) {
-            add (object);
-        }
-    }
-
+public class SeriSet<T> extends HashSet<T> implements Seri {
     @Override
     public boolean isDefault() {
         return size() == 0;
@@ -34,7 +25,6 @@ public class SeriList<T> extends ArrayList<T> implements Seri {
             serialize(object, prefix + SeriConf.INDENT, entitiesPool, stream);
         }
         stream.append(SeriConf.NEWLINE).append(prefix).append(SeriConf.END);
-
     }
 
     @Override

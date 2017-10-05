@@ -1,21 +1,16 @@
 package ecosystem.builder.buildactions;
 
 import core.Entity;
-import core.location.Hull;
-import core.location.Location;
-import core.SeriList;
-import core.location.LocationStack;
+import core.geometry.Hull;
+import core.geometry.Location;
+import core.seri.wrapers.SeriList;
 import core.seri.Seri;
 import ecosystem.Ecosystem;
-import ecosystem.entities.core.SeriEntities;
-import ecosystem.entities.core.partition.PartitionQuad;
-import ecosystem.entities.core.partition.QuadPartitionedEntities;
-import ecosystem.entities.core.partition.SpiralIterator;
+import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.valuable.sourced.Land;
 
 import javax.imageio.ImageIO;
-import java.awt.Graphics2D;
-import java.awt.Color;
+import java.awt.*;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -25,15 +20,51 @@ import java.lang.reflect.InvocationTargetException;
 public class Dumper extends BuildAction {
     public static class Params implements Seri {
         public Class<? extends Entity> mClasa;
-        public int mColor;
+        public Integer mColorPoints;
+        public Integer mColorHulls;
+        public Integer mColorNames;
+        public Integer mColorQuads;
+        public Integer mColorEmptyQuads;
+        public Integer mColorQuadIndexes;
+        public int mFontSize;
 
-        public Params (Class<? extends Entity> clasa, int color){
+        public Params (Class<? extends Entity> clasa, Integer points, Integer hulls, Integer names, Integer quads, Integer emptyQuads, Integer quadIndexes, int fontSize){
             mClasa = clasa;
-            mColor = color;
+            mColorPoints = points;
+            mColorHulls = hulls;
+            mColorNames = names;
+            mColorQuads = quads;
+            mColorEmptyQuads = emptyQuads;
+            mColorQuadIndexes = quadIndexes;
+            mFontSize = fontSize;
         }
 
-        public int getColor (){
-            return mColor;
+        public Integer getColorEmptyQuads() {
+            return mColorEmptyQuads;
+        }
+
+        public Integer getColorHulls() {
+            return mColorHulls;
+        }
+
+        public Integer getColorNames() {
+            return mColorNames;
+        }
+
+        public Integer getColorPoints() {
+            return mColorPoints;
+        }
+
+        public Integer getColorQuads() {
+            return mColorQuads;
+        }
+
+        public Integer getColorQuadIndexes() {
+            return mColorQuadIndexes;
+        }
+
+        public int getFontSize() {
+            return mFontSize;
         }
 
         public Class<? extends Entity> getClasa() {
@@ -62,40 +93,62 @@ public class Dumper extends BuildAction {
         BufferedImage image = new BufferedImage(mWidth, mHeight, BufferedImage.TYPE_INT_RGB);
         Graphics2D render = image.createGraphics();
 
-        QuadPartitionedEntities partioner = ecosystem.getPartitioner(Land.class);
-        partioner.render( render, mWidth, mHeight );
 
         for (Params params : mParams) {
+            render.setFont( new Font("SansSerif", Font.PLAIN, params.getFontSize()));
+
             Class<? extends Entity> clasa = params.getClasa ();
             SeriList<Entity> entities = ecosystem.getEntities(clasa);
-            int color = params.getColor();
-            if (clasa == Land.class) {
-                drawHulls(render, entities, color);
+
+            // draw hulls
+            if (clasa == Land.class && params.getColorHulls() != null) {
+                drawHulls(render, entities, params.getColorHulls());
             }
-            else
-                drawPoints(render, entities, color);
+
+            // draw points
+            if (params.getColorPoints() != null)
+                drawPoints(render, entities, params.getColorPoints());
+
+            // draw partitioner
+            Partitioner partioner = ecosystem.getPartitioner(clasa);
+            if (partioner != null)
+                partioner.render( render, mWidth, mHeight, params.getColorQuads(), params.getColorEmptyQuads(), params.getColorQuadIndexes());
+
+            // draw names
+            if (params.getColorNames() != null)
+                drawNames(render, entities, params.getColorNames(), 4, params.getFontSize() / 2);
+
         }
         ImageIO.write(image, "jpg", new File (mUrl));
     }
 
-    protected void drawPoints(Graphics2D render, SeriList<Entity> entities, int color) {
+    protected void drawPoints(Graphics2D render, SeriList<Entity> entities, Integer color) {
         render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
-        render.setBackground(null);
         for (Entity entity : entities) {
             Location location = entity.getLocation();
             double x = (location.getX() * 0.5 + 0.5) * mWidth;
             double y = (location.getY() * 0.5 + 0.5) * mHeight;
-            render.fill(new Rectangle2D.Double(x - 0.5, y - 0.5, 0.5, 0.5));
+            render.fill(new Rectangle2D.Double(x - 1, y - 1, 2, 2));
         }
     }
 
-    protected void drawHulls(Graphics2D render, SeriList<Entity> entities, int color) {
+    protected void drawHulls(Graphics2D render, SeriList<Entity> entities, Integer color) {
         render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
-        render.setBackground(null);
         for (Entity entity : entities) {
             Land land = (Land)entity;
             Hull hull = land.getHull();
             hull.render(render, mWidth, mHeight, 0);
+        }
+    }
+
+    protected void drawNames (Graphics2D render, SeriList<Entity> entities, Integer color, int offsetX, int offsetY){
+        render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
+        for (Entity entity : entities) {
+            Location location = entity.getLocation();
+            double x = (location.getX() * 0.5 + 0.5) * mWidth + offsetX;
+            double y = (location.getY() * 0.5 + 0.5) * mHeight + offsetY;
+            render.drawString(entity.getName (), (float)x, (float)y);
+
         }
     }
 

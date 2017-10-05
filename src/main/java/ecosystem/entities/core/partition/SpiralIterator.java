@@ -1,5 +1,7 @@
 package ecosystem.entities.core.partition;
 
+import core.MathExt;
+
 public class SpiralIterator {
     public static abstract class Receiver {
         public void onStart (int startX, int startY) {}
@@ -7,98 +9,100 @@ public class SpiralIterator {
         public boolean onValidValue (int x, int y, int startX, int startY) {return true;}
     }
 
-    protected transient static final int[] mDirs = new int[] {
-            1, 0,           // right
-            0, 1,           // down
-            -1, 0,          // left
-            0, -1           // up
-    };
-    protected transient int mStartX;
-    protected transient int mStartY;
-    protected transient int mX;
-    protected transient int mY;
-    protected transient int mWidth;
-    protected transient int mHeight;
-
-    protected transient int mEdgeSize;
-    protected transient int mEdgeStep;
-    protected transient int mSteps;
-    protected transient int mDir;
-    protected transient Receiver mReceiver;
-
-    public int getWidth (){
-        return mWidth;
-    }
-
-    public int getHeight (){
-        return mHeight;
-    }
-
     public boolean iterate (int x, int y, int width, int height, Receiver receiver){
-        mStartX = x;
-        mStartY = y;
-        mX = x;
-        mY = y;
-        mWidth = width;
-        mHeight = height;
-        mEdgeSize = 1;
+        int totalNumSamples = width * height;
+        int numSamples = 0;
+        int spiralOffset = 1;
+        boolean valid;
+        int cx = x;
+        int cy = y;
+        receiver.onStart(cx, cy);
 
-        mEdgeSize = 1;
-        mEdgeStep = 0;
-        mSteps = 0;
-        mDir = 0;
-        mReceiver = receiver;
-
-        // start
-        mReceiver.onStart(mStartX, mStartY);
-        if (!mReceiver.onValidValue(mX, mY, mStartX, mStartY))
+        if (!receiver.onValidValue(cx, cy, x, y))
             return false;
-        mSteps ++;
+        numSamples ++;
 
-        mX -= 2;
-        mY -= 1;
-        mEdgeSize += 2;
-        // start square
-        if (!mReceiver.onStartSquare(mX + 1, mY, mStartX, mStartY))
-            return false;
-
-
-        while (mSteps < mWidth * mHeight){
-            if (getNext() && !mReceiver.onStartSquare(mX, mY, mStartX, mStartY))
+        while (true) {
+            if (!receiver.onStartSquare(x - spiralOffset, y - spiralOffset, x, y))
                 return false;
-            while (mX < 0 || mX >= mWidth || mY < 0 || mY >= mHeight)
-                if (getNext() && !mReceiver.onStartSquare(mX, mY, mStartX, mStartY))
-                    return false;
-            mSteps ++;
 
-            if (!mReceiver.onValidValue(mX, mY, mStartX, mStartY))
-                return false;
+            // ===================
+            // up left to up right
+            // ===================
+            int x1 = x - spiralOffset;
+            int x2 = x + spiralOffset;
+            cy = y - spiralOffset;
+            valid = cy >= 0 && cy < height;
+            if (valid) {
+                x1 = MathExt.clamp(x1, 0, width - 1);
+                x2 = MathExt.clamp(x2, 0, width - 1);
+                for (cx = x1; cx <= x2; ++cx) {
+                    if (!receiver.onValidValue(cx, cy, x, y))
+                        return false;
+                    numSamples++;
+                    if (numSamples == totalNumSamples)
+                        return true;
+                }
+            }
+
+            // ======================
+            // up right to down right
+            // ======================
+            int y1 = y - spiralOffset + 1;
+            int y2 = y + spiralOffset;
+            cx = x + spiralOffset;
+            valid = cx >= 0 && cx < width;
+            if (valid) {
+                y1 = MathExt.clamp(y1, 0, height - 1);
+                y2 = MathExt.clamp(y2, 0, height - 1);
+                for (cy = y1; cy <= y2; ++cy) {
+                    if (!receiver.onValidValue(cx, cy, x, y))
+                        return false;
+                    numSamples++;
+                    if (numSamples == totalNumSamples)
+                        return true;
+                }
+            }
+
+            // =======================
+            // down right to down left
+            // =======================
+            x1 = x + spiralOffset - 1;
+            x2 = x - spiralOffset;
+            cy = y + spiralOffset;
+            valid = cy >= 0 && cy < height;
+            if (valid) {
+                x1 = MathExt.clamp(x1, 0, width - 1);
+                x2 = MathExt.clamp(x2, 0, width - 1);
+                for (cx = x1; cx >= x2; --cx) {
+                    if (!receiver.onValidValue(cx, cy, x, y))
+                        return false;
+                    numSamples++;
+                    if (numSamples == totalNumSamples)
+                        return true;
+                }
+            }
+
+            // ====================
+            // down left to up left
+            // ====================
+            y1 = y + spiralOffset - 1;
+            y2 = y - spiralOffset + 1;
+            cx = x - spiralOffset;
+            valid = cx >= 0 && cx < width;
+            if (valid) {
+                y1 = MathExt.clamp(y1, 0, height - 1);
+                y2 = MathExt.clamp(y2, 0, height - 1);
+                for (cy = y1; cy >= y2; --cy) {
+                    if (!receiver.onValidValue(cx, cy, x, y))
+                        return false;
+                    numSamples++;
+                    if (numSamples == totalNumSamples)
+                        return true;
+                }
+            }
+            spiralOffset ++;
         }
-        return true;
     }
 
-    protected boolean getNext(){
-        boolean startSquare = false;
-        // new step on edge
-        mEdgeStep ++;
-        // end of spiral
-        if (mDir == 3 && mEdgeStep == mEdgeSize){
-            mDir = 0;
-            mEdgeStep = 1;
-            mEdgeSize += 2;
-            mX -= 2;
-            mY -= 2;
-            startSquare = true;
-        }
-        // end of edge
-        if (mEdgeStep == mEdgeSize + 1){
-            mEdgeStep = 2;
-            mDir ++;
-        }
-        int addX = mDirs[mDir * 2];
-        int addY = mDirs[mDir * 2 + 1];
-        mX += addX;
-        mY += addY;
-        return startSquare;
-    }
 }

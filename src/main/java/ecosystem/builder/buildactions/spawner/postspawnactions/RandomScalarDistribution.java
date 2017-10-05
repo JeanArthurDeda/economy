@@ -1,8 +1,8 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
-import core.Rand;
-import core.SeriList;
+import core.MathExt;
+import core.seri.wrapers.SeriList;
 import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 import java.lang.reflect.InvocationTargetException;
@@ -38,7 +38,7 @@ public class RandomScalarDistribution extends PostSpawnAction {
         double[] values = new double[count];
         double total = 0.0;
         for (int i = 0; i < values.length; i++) {
-            total += values[i] = Rand.get();
+            total += values[i] = MathExt.random();
         }
         double scale = mTotalValue / total;
 

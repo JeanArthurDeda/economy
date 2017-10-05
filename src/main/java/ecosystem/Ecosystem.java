@@ -1,14 +1,14 @@
 package ecosystem;
 
 import core.Entity;
-import core.SeriMap;
-import core.SeriList;
-import core.location.Location;
+import core.seri.wrapers.SeriMap;
+import core.seri.wrapers.SeriList;
+import core.geometry.Location;
 import core.seri.Seri;
 
 import ecosystem.entities.core.SeriEntities;
 import ecosystem.entities.core.SeriEntitiesPool;
-import ecosystem.entities.core.partition.QuadPartitionedEntities;
+import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.transactional.Bank;
 import ecosystem.entities.transactional.Banks.NationalBank;
 import ecosystem.entities.transactional.Cell;
@@ -39,7 +39,7 @@ public class Ecosystem implements Seri {
     public SeriMap<Class<? extends Entity>, Integer> mEntitiesClassCount = new SeriMap<>();
 
     public SeriEntitiesPool mEntities = new SeriEntitiesPool();
-    public SeriMap<Class<? extends Entity>, QuadPartitionedEntities> mQuadPartitioners = new SeriMap<>();
+    public SeriMap<Class<? extends Entity>, Partitioner> mQuadPartitioners = new SeriMap<>();
 
     public Ecosystem() {
         // generate the list of entity extended classes
@@ -54,11 +54,11 @@ public class Ecosystem implements Seri {
         return mEntities.get(entityClass);
     }
 
-    public void setPartitioner(Class<? extends Entity> clasa, QuadPartitionedEntities partitioner){
+    public void setPartitioner(Class<? extends Entity> clasa, Partitioner partitioner){
         mQuadPartitioners.put (clasa, partitioner);
     }
 
-    public QuadPartitionedEntities getPartitioner (Class<? extends Entity> clasa){
+    public Partitioner getPartitioner (Class<? extends Entity> clasa){
         return mQuadPartitioners.get(clasa);
     }
 
@@ -67,7 +67,7 @@ public class Ecosystem implements Seri {
     // ===============
     public void linkEntity (Entity entity){
         Class<? extends Entity> clasa = entity.getClass();
-        QuadPartitionedEntities partioner = mQuadPartitioners.get(clasa);
+        Partitioner partioner = mQuadPartitioners.get(clasa);
 
         if (partioner != null)
             partioner.add(entity);

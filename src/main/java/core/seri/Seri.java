@@ -1,6 +1,5 @@
 package core.seri;
 
-import core.TokenStream;
 import core.Entity;
 
 import java.lang.reflect.Field;

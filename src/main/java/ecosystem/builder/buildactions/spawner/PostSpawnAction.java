@@ -1,10 +1,9 @@
 package ecosystem.builder.buildactions.spawner;
 
 import core.Entity;
-import core.SeriList;
+import core.seri.wrapers.SeriList;
 import core.seri.Seri;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class PostSpawnAction implements Seri {

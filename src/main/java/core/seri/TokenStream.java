@@ -1,6 +1,4 @@
-package core;
-
-import core.seri.SeriConf;
+package core.seri;
 
 public class TokenStream {
     protected String[] mTokens;

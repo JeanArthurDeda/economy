@@ -2,7 +2,7 @@ package ecosystem.entities.valuable.sourced;
 
 
 import core.Entity;
-import core.location.Hull;
+import core.geometry.Hull;
 import ecosystem.entities.categories.Valuable;
 import ecosystem.entities.core.SeriEntities;
 

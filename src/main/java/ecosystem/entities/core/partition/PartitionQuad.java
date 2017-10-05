@@ -1,7 +1,6 @@
 package ecosystem.entities.core.partition;
 
-import core.location.Bound;
-import core.location.Location;
+import core.geometry.Bound;
 import core.seri.Seri;
 import ecosystem.entities.core.SeriEntities;
 

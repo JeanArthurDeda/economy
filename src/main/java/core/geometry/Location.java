@@ -1,6 +1,6 @@
-package core.location;
+package core.geometry;
 
-import core.Rand;
+import core.MathExt;
 import core.seri.Seri;
 
 public class Location implements Seri {
@@ -150,52 +150,7 @@ public class Location implements Seri {
     }
 
     public Location jitter (double sizeX, double sizeY){
-        return add ((Rand.get() - 0.5) * sizeX, (Rand.get() - 0.5) * sizeY);
-    }
-
-    public Location clone (LocationStack stack){
-        Location clone = stack.get();
-        return clone.set(this);
-    }
-
-    public Location normalize(LocationStack stack) {
-        Location clone = clone(stack);
-        return clone.normalize();
-    }
-
-    public Location add (double locationX, double locationY, LocationStack stack){
-        Location clone = clone(stack);
-        return clone.add (locationX, locationY);
-    }
-
-    public Location add (Location other, LocationStack stack){
-        Location clone = clone(stack);
-        return clone.add (other);
-    }
-
-    public Location sub (double locationX, double locationY, LocationStack stack){
-        Location clone = clone(stack);
-        return clone.sub (locationX, locationY);
-    }
-
-    public Location sub (Location other, LocationStack stack){
-        Location clone = clone(stack);
-        return clone.sub (other);
-    }
-
-    public Location negate (LocationStack stack){
-        Location clone = clone(stack);
-        return clone.negate();
-    }
-
-    public Location scale(double value, LocationStack stack){
-        Location clone = clone(stack);
-        return clone.scale(value);
-    }
-
-    public Location scale(double locationX, double locationY, LocationStack stack){
-        Location clone = clone(stack);
-        return clone.scale(locationX, locationY);
+        return add ((MathExt.random() - 0.5) * sizeX, (MathExt.random() - 0.5) * sizeY);
     }
 
 }

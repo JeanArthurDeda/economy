@@ -1,15 +1,15 @@
 package ecosystem.builder.buildactions;
 
 import core.Entity;
-import core.SeriList;
+import core.seri.wrapers.SeriList;
 import ecosystem.Ecosystem;
-import ecosystem.entities.core.partition.QuadPartitionedEntities;
+import ecosystem.entities.core.partition.Partitioner;
 
 public class QuadPartion extends BuildAction {
     public SeriList<Class<? extends Entity>> mClasses;
-    public QuadPartitionedEntities mPartitioner;
+    public Partitioner mPartitioner;
 
-    public QuadPartion (Class<? extends Entity>[] classes, QuadPartitionedEntities partioner){
+    public QuadPartion (Class<? extends Entity>[] classes, Partitioner partioner){
         mClasses = new SeriList<>(classes);
         mPartitioner = partioner;
     }

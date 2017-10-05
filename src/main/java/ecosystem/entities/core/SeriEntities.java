@@ -1,6 +1,6 @@
 package ecosystem.entities.core;
 
-import core.SeriList;
+import core.seri.wrapers.SeriList;
 import core.Entity;
 import java.util.Collection;
 import java.util.HashMap;

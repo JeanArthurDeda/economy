@@ -1,8 +1,8 @@
 package ecosystem.builder.buildactions.spawner.postspawnactions;
 
 import core.Entity;
-import core.location.Location;
-import core.SeriList;
+import core.geometry.Location;
+import core.seri.wrapers.SeriList;
 import ecosystem.builder.buildactions.spawner.PostSpawnAction;
 
 import java.lang.reflect.InvocationTargetException;
