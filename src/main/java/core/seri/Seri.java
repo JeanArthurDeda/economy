@@ -1,17 +1,16 @@
 package core.seri;
 
-import core.Entity;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.List;
 
-// ===================================================================================
-// Polymorphic, Bi-directional Entity graph, text serialized, with a pool for entities
-// ===================================================================================
-// Supports Boolean, Integer, Long, Double, Float, String, Class
+// ========================================================
+// Polymorphic, graph, text serialization & deserialization
+// ========================================================
+// Supports Boolean, Integer, Long, Double, Float, String, Class, Enum
 // and others Seri's
-// Only entities supports bi-directional graph references and they are referenced from a pool
+// Seri's that are used in a graph manner should implement SeriPool, they are serialized & deserialized by index,
+// and are responsible to add themselves to the pool by calling Pool.getInstance().add (this) in the default constructor
+// Now I can only wish Java had a ... destructor
 
 public interface Seri {
     // =============
@@ -21,7 +20,7 @@ public interface Seri {
         return false;
     }
 
-    default void serialize(String prefix, List<Entity> entitiesPool, StringBuilder stream) throws IllegalAccessException {
+    default void serialize(String prefix, StringBuilder stream) throws IllegalAccessException {
         stream.append(SeriConf.BEGIN);
         Field[] fields = getClass().getFields();
         for (Field field : fields){
@@ -36,12 +35,12 @@ public interface Seri {
 
             stream.append(SeriConf.NEWLINE).append(prefix).append(SeriConf.INDENT);
             stream.append(getFieldName(field)).append(SeriConf.SEPARATOR).append(getClassName(object.getClass())).append(SeriConf.SEPARATOR);
-            serialize(object, prefix + SeriConf.INDENT, entitiesPool, stream);
+            serialize(object, prefix + SeriConf.INDENT, stream);
         }
         stream.append(SeriConf.NEWLINE).append(prefix).append(SeriConf.END);
     }
 
-    default void serialize(Object object, String prefix, List<Entity> entitiesPool, StringBuilder stream) throws IllegalAccessException {
+    default void serialize(Object object, String prefix, StringBuilder stream) throws IllegalAccessException {
         Class<?> clasa = object.getClass();
         if (clasa == Boolean.class ||
             clasa == Integer.class ||
@@ -52,10 +51,10 @@ public interface Seri {
             stream.append(object.toString());
         } else if (clasa == Class.class){
             stream.append(getClassName((Class<?>)object));
-        } else if (Entity.class.isAssignableFrom(clasa)){
-            stream.append(entitiesPool.indexOf(object));
+        } else if (SeriPool.class.isAssignableFrom(clasa)){
+            stream.append(Pool.getInstance().indexOf(object));
         } else if (Seri.class.isAssignableFrom(clasa)){
-            ((Seri)object).serialize(prefix, entitiesPool, stream);
+            ((Seri)object).serialize(prefix, stream);
         } else if (clasa.isEnum()){
             stream.append(object.toString());
         }
@@ -64,7 +63,7 @@ public interface Seri {
     // ===============
     // Deserialization
     // ===============
-    default void deserialize(TokenStream stream, List<Entity> entitiesPool) throws Exception {
+    default void deserialize(TokenStream stream) throws Exception {
         stream.get(SeriConf.BEGIN);
 
         Field[] fields = getClass().getFields();
@@ -80,13 +79,13 @@ public interface Seri {
             if (null == field){
                 deserializationSkip (stream);
             } else {
-                Object object = deserialize(clasa, entitiesPool, stream);
+                Object object = deserialize(clasa, stream);
                 field.set(this, object);
             }
         } while (true);
     }
 
-    default Object deserialize (Class<?> clasa, List<Entity> entitiesPool, TokenStream stream) throws Exception {
+    default Object deserialize (Class<?> clasa, TokenStream stream) throws Exception {
         Object object = null;
         if (clasa == Integer.class){
             object = Integer.parseInt(stream.get());
@@ -102,12 +101,12 @@ public interface Seri {
             object = stream.get();
         } else if (Class.class == clasa) {
             object = getClass(stream.get());
-        } else if (Entity.class.isAssignableFrom(clasa)) {
+        } else if (SeriPool.class.isAssignableFrom(clasa)) {
             int index = Integer.parseInt(stream.get());
-            object = entitiesPool.get(index);
+            object = Pool.getInstance().get(index);
         } else if (Seri.class.isAssignableFrom(clasa)){
             object = create(clasa);
-            ((Seri)object).deserialize(stream, entitiesPool);
+            ((Seri)object).deserialize(stream);
         } else if (clasa.isEnum()) {
             Object[] enumValues = clasa.getEnumConstants();
             String value = stream.get();

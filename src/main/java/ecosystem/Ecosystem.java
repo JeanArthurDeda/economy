@@ -1,13 +1,15 @@
 package ecosystem;
 
 import core.Entity;
+import core.seri.Pool;
+import core.seri.SeriConf;
+import core.seri.TokenStream;
 import core.seri.wrapers.SeriMap;
 import core.seri.wrapers.SeriList;
 import core.geometry.Location;
 import core.seri.Seri;
 
 import ecosystem.entities.core.SeriEntities;
-import ecosystem.entities.core.SeriEntitiesPool;
 import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.transactional.Bank;
 import ecosystem.entities.transactional.Banks.NationalBank;
@@ -38,7 +40,7 @@ import ecosystem.entities.valuable.sourced.EVechicle;
 public class Ecosystem implements Seri {
     public SeriMap<Class<? extends Entity>, Integer> mEntitiesClassCount = new SeriMap<>();
 
-    public SeriEntitiesPool mEntities = new SeriEntitiesPool();
+    public SeriEntities mEntities = new SeriEntities();
     public SeriMap<Class<? extends Entity>, Partitioner> mQuadPartitioners = new SeriMap<>();
 
     public Ecosystem() {
@@ -137,5 +139,24 @@ public class Ecosystem implements Seri {
 
     public SeriMap<Class<? extends Entity>, Integer> getEntitiesClassCount() {
         return mEntitiesClassCount;
+    }
+
+    // ====================================================
+    // Serialization & Deserialization with respect to pool
+    // ====================================================
+    public void save(StringBuilder stream) throws IllegalAccessException {
+        Pool.getInstance().serialize("", stream);
+        stream.append(SeriConf.NEWLINE);
+        serialize("", stream);
+    }
+
+    public void load (TokenStream stream) throws Exception {
+        Pool.getInstance().deserialize(stream);
+        deserialize(stream);
+    }
+
+    @Override
+    public void deserialize(TokenStream stream) throws Exception {
+
     }
 }

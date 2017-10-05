@@ -1,12 +1,10 @@
 package core.seri.wrapers;
 
-import core.Entity;
 import core.seri.Seri;
 import core.seri.SeriConf;
 import core.seri.TokenStream;
 
 import java.util.ArrayList;
-import java.util.List;
 
 // Seri wrapper for list
 
@@ -28,19 +26,19 @@ public class SeriList<T> extends ArrayList<T> implements Seri {
     }
 
     @Override
-    public void serialize(String prefix, List<Entity> entitiesPool, StringBuilder stream) throws IllegalAccessException {
+    public void serialize(String prefix, StringBuilder stream) throws IllegalAccessException {
         stream.append(SeriConf.BEGIN);
         for (Object object : this){
             stream.append(SeriConf.NEWLINE).append(prefix).append(SeriConf.INDENT);
             stream.append(getClassName(object.getClass())).append(SeriConf.SEPARATOR);
-            serialize(object, prefix + SeriConf.INDENT, entitiesPool, stream);
+            serialize(object, prefix + SeriConf.INDENT, stream);
         }
         stream.append(SeriConf.NEWLINE).append(prefix).append(SeriConf.END);
 
     }
 
     @Override
-    public void deserialize(TokenStream stream, List<Entity> entitiesPool) throws Exception {
+    public void deserialize(TokenStream stream) throws Exception {
         clear();
 
         stream.get(SeriConf.BEGIN);
@@ -49,7 +47,7 @@ public class SeriList<T> extends ArrayList<T> implements Seri {
             if (SeriConf.END.equals(className))
                 break;
             Class clasa = getClass(className);
-            Object object = deserialize(clasa, entitiesPool, stream);
+            Object object = deserialize(clasa, stream);
             add ((T)object);
         } while (true);
     }

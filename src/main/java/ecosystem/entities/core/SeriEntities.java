@@ -9,7 +9,7 @@ import java.util.Set;
 
 
 public class SeriEntities extends SeriList<Entity> {
-    protected HashMap<Class<?>, SeriList<Entity>> mClassEntities = new HashMap<>();
+    protected HashMap<Class<? extends Entity>, SeriList<Entity>> mClassEntities = new HashMap<>();
 
     @Override
     public boolean add(Entity entity) {
@@ -62,7 +62,7 @@ public class SeriEntities extends SeriList<Entity> {
         return mClassEntities.get(entityClass);
     }
 
-    public Set<Class<?>> getClasses (){
+    public Set<Class<? extends Entity>> getClasses (){
         return mClassEntities.keySet();
     }
 }

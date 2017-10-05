@@ -7,7 +7,7 @@ import core.seri.Seri;
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class PostSpawnAction implements Seri {
-    public boolean mIsCached;
+    protected transient boolean mIsCached;
 
     public void cache () throws Exception {
         mIsCached = true;

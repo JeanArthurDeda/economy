@@ -94,8 +94,8 @@ public class Partitioner implements Seri{
         }
 
         // draw quad indexes
-        if (quadIndexesColor != null)
-            render.setColor (new Color((quadIndexesColor >> 16) & 0xff, (quadIndexesColor >> 8) & 0xff, quadIndexesColor & 0xff));
+        if (quadIndexesColor != null) {
+            render.setColor(new Color((quadIndexesColor >> 16) & 0xff, (quadIndexesColor >> 8) & 0xff, quadIndexesColor & 0xff));
             for (int i = 0; i < mNumQuads; ++i)
                 for (int j = 0; j < mNumQuads; ++j) {
                     PartitionQuad quad = mQuads.get(i * mNumQuads + j);
@@ -108,6 +108,7 @@ public class Partitioner implements Seri{
                     y = width * (y * 0.5 + 0.5);
                     render.drawString(j + "," + i, (float) x, (float) y);
                 }
+        }
 
         return this;
     }
