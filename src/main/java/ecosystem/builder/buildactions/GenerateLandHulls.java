@@ -3,10 +3,10 @@ package ecosystem.builder.buildactions;
 import core.Entity;
 import core.seri.wrapers.SeriList;
 import core.performance.TimedTask;
-import core.geometry.Hull;
 import core.geometry.Location;
 import core.geometry.Plane;
 import ecosystem.Ecosystem;
+import ecosystem.entities.core.LandHull;
 import ecosystem.entities.core.partition.PartitionQuad;
 import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.core.partition.SpiralIterator;
@@ -16,8 +16,15 @@ public class GenerateLandHulls extends BuildAction {
 
     @Override
     public void execute(Ecosystem ecosystem) throws Exception {
+        SeriList<Entity> entities = ecosystem.getEntities(Land.class);
         Partitioner partioner = ecosystem.getPartitioner(Land.class);
         SeriList<PartitionQuad> quads = partioner.getQuads();
+
+        // generate all the entities hulls
+        for (Entity entity : entities) {
+            Land land = (Land)entity;
+            land.setHull((LandHull) new LandHull(land).setFromWorldBound());
+        }
 
         // ========================
         // Spiral iterator Receiver
@@ -26,7 +33,6 @@ public class GenerateLandHulls extends BuildAction {
             // inputs
             protected Land mLand;
             // processing
-            protected Hull mHull;
             protected Location mMiddle = new Location();
             protected Location mNor = new Location();
             protected Plane mPlane = new Plane();
@@ -35,12 +41,6 @@ public class GenerateLandHulls extends BuildAction {
 
             public void setLand (Land land){
                 mLand = land;
-            }
-
-            @Override
-            public void onStart(int startX, int startY) {
-                mHull = new Hull().setFromWorldBound();
-                mLand.setHull(mHull);
             }
 
             @Override
@@ -62,11 +62,12 @@ public class GenerateLandHulls extends BuildAction {
                     return true;
                 }
 
+                LandHull hull = mLand.getHull();
                 // trivial rejection based on quad
                 Location l1 = mLand.getLocation();
                 if (x != startX || y != startY) {
                     double extent = 0;
-                    SeriList<Location> locations = mHull.getLocations();
+                    SeriList<Location> locations = hull.getLocations();
                     for (Location location : locations) {
                         extent = Math.max (extent, location.dist(mLand.getLocation()));
                     }
@@ -83,7 +84,8 @@ public class GenerateLandHulls extends BuildAction {
                 }
 
                 for (Entity entity : entities) {
-                    if (mLand == entity)
+                    Land land = (Land)entity;
+                    if (mLand == land)
                         continue;
                     Location l2 = entity.getLocation();
 
@@ -92,8 +94,8 @@ public class GenerateLandHulls extends BuildAction {
                     mNor.set(l2).sub(l1).normalize();
                     mPlane.set (mMiddle, mNor);
 
-                    if (Hull.CheckResult.INTERSECT == mHull.checkWithPlane(mPlane)){
-                        mHull.carve(mPlane);
+                    if (LandHull.CheckResult.INTERSECT == hull.checkWithPlane(mPlane)){
+                        hull.carve(mPlane, land.getHull());
                     }
                 }
                 return true;
@@ -102,7 +104,6 @@ public class GenerateLandHulls extends BuildAction {
         LandHullConstructor hullConstructor = new LandHullConstructor();
         SpiralIterator spiralIterator = new SpiralIterator();
 
-        SeriList<Entity> entities = ecosystem.getEntities(Land.class);
         int size = entities.size();
         for (int i = 0; i < size; i++) {
             double ratio = (double)i / (double)size;
@@ -113,5 +114,6 @@ public class GenerateLandHulls extends BuildAction {
             hullConstructor.setLand((Land)entity);
             spiralIterator.iterate(x, y, partioner.getNumQuads(), partioner.getNumQuads(), hullConstructor);
         }
+
     }
 }

@@ -123,7 +123,7 @@ public class Dumper extends BuildAction {
     }
 
     protected void drawPoints(Graphics2D render, SeriList<Entity> entities, Integer color) {
-        render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
+        render.setColor (new Color(color, true));
         for (Entity entity : entities) {
             Location location = entity.getLocation();
             double x = (location.getX() * 0.5 + 0.5) * mWidth;
@@ -133,7 +133,7 @@ public class Dumper extends BuildAction {
     }
 
     protected void drawHulls(Graphics2D render, SeriList<Entity> entities, Integer color) {
-        render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
+        render.setColor (new Color(color, true));
         for (Entity entity : entities) {
             Land land = (Land)entity;
             Hull hull = land.getHull();
@@ -142,7 +142,7 @@ public class Dumper extends BuildAction {
     }
 
     protected void drawNames (Graphics2D render, SeriList<Entity> entities, Integer color, int offsetX, int offsetY){
-        render.setColor (new Color((color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff));
+        render.setColor (new Color(color, true));
         for (Entity entity : entities) {
             Location location = entity.getLocation();
             double x = (location.getX() * 0.5 + 0.5) * mWidth + offsetX;

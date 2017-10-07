@@ -14,11 +14,11 @@ public class MainBuilder {
             EcosystemBuilder builder = new EcosystemBuilder(10);
             builder
                 .execute(new SpawnAction()
-                    .spawnClass(Land.class, new SpawnParams(1000)
+                    .spawnClass(Land.class, new SpawnParams(10000)
                             .executePostSpawn(new DensityMapLocationDistribution("c:\\dev\\economy\\assets\\land.jpg"))))
                     .execute(new GenerateLandHulls())
                     .execute(new Dumper("c:\\dev\\economy\\debugTree\\ecosystem.jpg", 2048, 2048)
-                    .dump(new Dumper.Params(Land.class, 0xffffff, 0xffffff, null, 0xffffff, null, null, 10)));
+                    .dump(new Dumper.Params(Land.class, 0xffffffff, 0x40ffffff, null, 0x8000ff00, null, null, 10)));
 
             Ecosystem ecosystem = builder.build();
 

@@ -8,9 +8,8 @@ import java.lang.reflect.Modifier;
 // ========================================================
 // Supports Boolean, Integer, Long, Double, Float, String, Class, Enum
 // and others Seri's
-// Seri's that are used in a graph manner should implement SeriPool, they are serialized & deserialized by index,
-// and are responsible to add themselves to the pool by calling Pool.getInstance().add (this) in the default constructor
-// Now I can only wish Java had a ... destructor
+// Seri's that are used in a graph manner should implement SeriGraph, they are serialized & deserialized by index,
+// and are responsible to add themselves to the pool by calling SeriGraphPool.getInstance().add (this) in the default constructor
 
 public interface Seri {
     // =============
@@ -51,8 +50,8 @@ public interface Seri {
             stream.append(object.toString());
         } else if (clasa == Class.class){
             stream.append(getClassName((Class<?>)object));
-        } else if (SeriPool.class.isAssignableFrom(clasa)){
-            stream.append(Pool.getInstance().indexOf(object));
+        } else if (SeriGraph.class.isAssignableFrom(clasa)){
+            stream.append(SeriGraphPool.getInstance().indexOf((SeriGraph)object));
         } else if (Seri.class.isAssignableFrom(clasa)){
             ((Seri)object).serialize(prefix, stream);
         } else if (clasa.isEnum()){
@@ -101,9 +100,9 @@ public interface Seri {
             object = stream.get();
         } else if (Class.class == clasa) {
             object = getClass(stream.get());
-        } else if (SeriPool.class.isAssignableFrom(clasa)) {
+        } else if (SeriGraph.class.isAssignableFrom(clasa)) {
             int index = Integer.parseInt(stream.get());
-            object = Pool.getInstance().get(index);
+            object = SeriGraphPool.getInstance().get(index);
         } else if (Seri.class.isAssignableFrom(clasa)){
             object = create(clasa);
             ((Seri)object).deserialize(stream);

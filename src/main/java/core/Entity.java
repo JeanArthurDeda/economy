@@ -2,19 +2,19 @@ package core;
 
 
 import core.geometry.Location;
-import core.seri.Pool;
+import core.seri.SeriGraphPool;
 import core.seri.Seri;
-import core.seri.SeriPool;
+import core.seri.SeriGraph;
 import ecosystem.entities.valuable.sourced.Land;
 
 
-abstract public class Entity implements Seri, SeriPool {
+abstract public class Entity implements Seri, SeriGraph {
     public Location mLocation;
     public Land mLand;
     public String mName;
 
     public Entity (){
-        Pool.getInstance().add(this);
+        SeriGraphPool.getInstance().add(this);
     }
 
     public Land getLand (){

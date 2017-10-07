@@ -10,9 +10,9 @@ public class Plane implements Seri {
 
     }
 
-    public Plane(Location location, Location nor) {
-        mLocation = location;
-        mNor = nor;
+    public Plane(Plane other) {
+        mLocation = other.getLocation();
+        mNor = other.getNor();
     }
 
     public Plane set (Location location, Location nor){

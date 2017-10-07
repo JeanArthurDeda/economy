@@ -1,7 +1,7 @@
 package ecosystem;
 
 import core.Entity;
-import core.seri.Pool;
+import core.seri.SeriGraphPool;
 import core.seri.SeriConf;
 import core.seri.TokenStream;
 import core.seri.wrapers.SeriMap;
@@ -145,13 +145,13 @@ public class Ecosystem implements Seri {
     // Serialization & Deserialization with respect to pool
     // ====================================================
     public void save(StringBuilder stream) throws IllegalAccessException {
-        Pool.getInstance().serialize("", stream);
+        SeriGraphPool.getInstance().serialize("", stream);
         stream.append(SeriConf.NEWLINE);
         serialize("", stream);
     }
 
     public void load (TokenStream stream) throws Exception {
-        Pool.getInstance().deserialize(stream);
+        SeriGraphPool.getInstance().deserialize(stream);
         deserialize(stream);
     }
 
