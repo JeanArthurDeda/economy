@@ -36,7 +36,7 @@ public class SpawnAction extends BuildAction {
             // link them
             TimedTask.start("Link " + count + " " + key.getSimpleName());
             for (Entity entity : entities) {
-                ecosystem.linkEntity(entity);
+                ecosystem.link(entity);
             }
             TimedTask.finish();
         }

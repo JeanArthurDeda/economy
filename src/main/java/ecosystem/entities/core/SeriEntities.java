@@ -2,6 +2,8 @@ package ecosystem.entities.core;
 
 import core.seri.wrapers.SeriList;
 import core.Entity;
+import core.seri.wrapers.SeriMap;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -9,7 +11,7 @@ import java.util.Set;
 
 
 public class SeriEntities extends SeriList<Entity> {
-    protected HashMap<Class<? extends Entity>, SeriList<Entity>> mClassEntities = new HashMap<>();
+    protected SeriMap<Class<? extends Entity>, SeriList<Entity>> mClassEntities = new SeriMap<>();
 
     @Override
     public boolean add(Entity entity) {
@@ -29,6 +31,19 @@ public class SeriEntities extends SeriList<Entity> {
         if (!rem2ClassList(entity))
             return false;
         return super.remove(entity);
+    }
+    @Override
+    public void clear() {
+        mClassEntities.clear();
+        super.clear();
+    }
+
+    public SeriList<Entity> get (Class<?> entityClass){
+        return mClassEntities.get(entityClass);
+    }
+
+    public Set<Class<? extends Entity>> getClasses (){
+        return mClassEntities.keySet();
     }
 
     protected void add2ClassList(Entity entity) {
@@ -52,17 +67,4 @@ public class SeriEntities extends SeriList<Entity> {
         return false;
     }
 
-    @Override
-    public void clear() {
-        mClassEntities.clear();
-        super.clear();
-    }
-
-    public SeriList<Entity> get (Class<?> entityClass){
-        return mClassEntities.get(entityClass);
-    }
-
-    public Set<Class<? extends Entity>> getClasses (){
-        return mClassEntities.keySet();
-    }
 }

@@ -9,13 +9,20 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 public class GraphScalarDistribution extends PostSpawnAction {
-    public String mSetFunName;
+    public String mSetMethodName;
     protected double mTotalValue;
     public SeriList<Location> mPoints = new SeriList<>();
 
-    public GraphScalarDistribution(String setFuncName, double totalValue){
-        mSetFunName = setFuncName;
+    public GraphScalarDistribution(String setMethodName, double totalValue){
+        mSetMethodName = setMethodName;
         mTotalValue = totalValue;
+        mIsCached = true;
+    }
+
+    public GraphScalarDistribution(String setMethodName){
+        mSetMethodName = setMethodName;
+        mTotalValue = 0.0;
+        mIsCached = true;
     }
 
     public GraphScalarDistribution graphPoint(double x, double y){
@@ -29,8 +36,8 @@ public class GraphScalarDistribution extends PostSpawnAction {
         // =====
         int count = 0;
         for (Entity entity : entities) {
-            Method set = entity.getClass().getMethod(mSetFunName, double.class);
-            if (set != null) {
+            Method setMethod = entity.getClass().getMethod(mSetMethodName, double.class);
+            if (setMethod != null) {
                 count++;
             }
         }
@@ -68,7 +75,7 @@ public class GraphScalarDistribution extends PostSpawnAction {
             }
             total += values[i] = y;
         }
-        double scale = mTotalValue / total;
+        double scale = mTotalValue != 0.0 ? mTotalValue / total : 1.0;
 
         // ===
         // set
@@ -76,9 +83,9 @@ public class GraphScalarDistribution extends PostSpawnAction {
         count = 0;
         for (int i = 0; i < entities.size(); i++) {
             Entity entity = entities.get(i);
-            Method set = entity.getClass().getMethod(mSetFunName, double.class);
-            if (set != null) {
-                set.invoke(entity, values[count++] * scale);
+            Method setMethod = entity.getClass().getMethod(mSetMethodName, double.class);
+            if (setMethod != null) {
+                setMethod.invoke(entity, values[count++] * scale);
             }
         }
     }

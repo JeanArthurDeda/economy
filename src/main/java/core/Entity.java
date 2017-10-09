@@ -23,6 +23,7 @@ abstract public class Entity implements Seri, SeriGraph {
 
     public void setLand (Land land){
         mLand = land;
+        mLand.addEntity (this);
     }
 
     public Location getLocation() {

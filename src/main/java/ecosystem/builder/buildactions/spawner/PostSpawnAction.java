@@ -1,13 +1,19 @@
 package ecosystem.builder.buildactions.spawner;
 
 import core.Entity;
+import core.seri.SeriGraph;
+import core.seri.SeriGraphPool;
 import core.seri.wrapers.SeriList;
 import core.seri.Seri;
 
 import java.lang.reflect.InvocationTargetException;
 
-public abstract class PostSpawnAction implements Seri {
+public abstract class PostSpawnAction implements Seri, SeriGraph {
     protected transient boolean mIsCached;
+
+    public PostSpawnAction(){
+        SeriGraphPool.getInstance().add (this);
+    }
 
     public void cache () throws Exception {
         mIsCached = true;

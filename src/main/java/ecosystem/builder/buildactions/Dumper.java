@@ -8,14 +8,17 @@ import core.seri.Seri;
 import ecosystem.Ecosystem;
 import ecosystem.entities.core.partition.Partitioner;
 import ecosystem.entities.valuable.sourced.Land;
+import javafx.scene.shape.Circle;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.Ellipse2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 public class Dumper extends BuildAction {
     public static class Params implements Seri {
@@ -27,16 +30,42 @@ public class Dumper extends BuildAction {
         public Integer mColorEmptyQuads;
         public Integer mColorQuadIndexes;
         public int mFontSize;
+        public String mGetSizeMethodName;
+        public double mSizeScale;
+        public double mSizeBias;
 
-        public Params (Class<? extends Entity> clasa, Integer points, Integer hulls, Integer names, Integer quads, Integer emptyQuads, Integer quadIndexes, int fontSize){
+        public Params (Class<? extends Entity> clasa, Integer pointsColor){
             mClasa = clasa;
-            mColorPoints = points;
-            mColorHulls = hulls;
+            mColorPoints = pointsColor;
+        }
+
+        public Params hulls (Integer hullsColor){
+            mColorHulls = hullsColor;
+            return this;
+        }
+
+        public Params fontSize (int size){
+            mFontSize = size;
+            return this;
+        }
+
+        public Params names (Integer names){
             mColorNames = names;
-            mColorQuads = quads;
-            mColorEmptyQuads = emptyQuads;
-            mColorQuadIndexes = quadIndexes;
-            mFontSize = fontSize;
+            return this;
+        }
+
+        public Params partitioner (Integer quadsColor, Integer emptyQuadsColor, Integer quadIndexesColor){
+            mColorQuads = quadsColor;
+            mColorEmptyQuads = emptyQuadsColor;
+            mColorQuadIndexes = quadIndexesColor;
+            return this;
+        }
+
+        public Params pointSize (String getSizeMethodName, double scale, double bias){
+            mGetSizeMethodName = getSizeMethodName;
+            mSizeScale = scale;
+            mSizeBias = bias;
+            return this;
         }
 
         public Integer getColorEmptyQuads() {
@@ -69,6 +98,18 @@ public class Dumper extends BuildAction {
 
         public Class<? extends Entity> getClasa() {
             return mClasa;
+        }
+
+        public String getSizeMethodName() {
+            return mGetSizeMethodName;
+        }
+
+        public double getSizeScale (){
+            return mSizeScale;
+        }
+
+        public double getSizeBias(){
+            return mSizeBias;
         }
     }
 
@@ -106,8 +147,13 @@ public class Dumper extends BuildAction {
             }
 
             // draw points
-            if (params.getColorPoints() != null)
-                drawPoints(render, entities, params.getColorPoints());
+            if (params.getColorPoints() != null) {
+                Method getMethod = null;
+                String getMethodName = params.getSizeMethodName();
+                if (getMethodName != null)
+                    getMethod = clasa.getMethod(getMethodName);
+                drawPoints(render, entities, params.getColorPoints(), getMethod, params.getSizeScale(), params.getSizeBias());
+            }
 
             // draw partitioner
             Partitioner partioner = ecosystem.getPartitioner(clasa);
@@ -122,13 +168,17 @@ public class Dumper extends BuildAction {
         ImageIO.write(image, "jpg", new File (mUrl));
     }
 
-    protected void drawPoints(Graphics2D render, SeriList<Entity> entities, Integer color) {
+    protected void drawPoints(Graphics2D render, SeriList<Entity> entities, Integer color, Method getSizeMethod, double sizeScale, double sizeBias) throws InvocationTargetException, IllegalAccessException {
         render.setColor (new Color(color, true));
         for (Entity entity : entities) {
             Location location = entity.getLocation();
+            double size = 3.0;
+            if (getSizeMethod != null){
+                size = (double) getSizeMethod.invoke(entity) * sizeScale + sizeBias;
+            }
             double x = (location.getX() * 0.5 + 0.5) * mWidth;
             double y = (location.getY() * 0.5 + 0.5) * mHeight;
-            render.fill(new Rectangle2D.Double(x - 1, y - 1, 2, 2));
+            render.fill(new Ellipse2D.Double(x, y, size, size));
         }
     }
 

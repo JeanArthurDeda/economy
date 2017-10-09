@@ -71,6 +71,15 @@ public class Partitioner implements Seri{
         return index;
     }
 
+    public PartitionQuad getQuad (int x, int y){
+        return mQuads.get (y * mNumQuads + x);
+    }
+
+    public PartitionQuad getQuad (Location location){
+        int index = getQuadIndex(location);
+        return mQuads.get(index);
+    }
+
     public SeriList<PartitionQuad> getQuads () {
         return mQuads;
     }
@@ -89,7 +98,7 @@ public class Partitioner implements Seri{
                     continue;
                 render.setColor (color);
                 Bound bound = quad.getBound();
-                bound.render(render, width, height);
+                bound.render(render, width, height, -0.005);
             }
         }
 

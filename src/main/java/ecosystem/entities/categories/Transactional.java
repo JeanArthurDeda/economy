@@ -2,9 +2,8 @@ package ecosystem.entities.categories;
 
 
 import core.Entity;
+import core.seri.wrapers.SeriMap;
 import ecosystem.entities.core.SeriEntities;
-
-import java.util.HashMap;
 
 abstract public class Transactional extends Entity {
     // Assets
@@ -13,7 +12,7 @@ abstract public class Transactional extends Entity {
     // Liabilities
     public SeriEntities mCredits = new SeriEntities();
     // Expenses
-    public transient HashMap<Class<Entity>, Double> mExpensesRatios = new HashMap<>();
+    public transient SeriMap<Class<Entity>, Double> mExpensesRatios = new SeriMap<>();
 
     public Transactional(){
         super();

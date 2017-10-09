@@ -77,11 +77,11 @@ public class Bound implements Seri {
         return true;
     }
 
-    public Bound render (Graphics2D render, int width, int height){
-        double x = (mMin.getX() * 0.5 + 0.5) * width;
-        double y = (mMin.getY() * 0.5 + 0.5) * height;
-        double w = (mMax.getX() - mMin.getX ()) * width * 0.5;
-        double h = (mMax.getY() - mMin.getY ()) * height * 0.5;
+    public Bound render (Graphics2D render, int width, int height, double expand){
+        double x = ((mMin.getX() + expand) * 0.5 + 0.5) * width;
+        double y = ((mMin.getY() + expand) * 0.5 + 0.5) * height;
+        double w = ((mMax.getX() + expand) - mMin.getX ()) * width * 0.5;
+        double h = ((mMax.getY() + expand) - mMin.getY ()) * height * 0.5;
         render.draw(new Rectangle2D.Double( x, y, w, h));
         return this;
     }
